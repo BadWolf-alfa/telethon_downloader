@@ -78,7 +78,6 @@ class TelegramBot:
 
         self.TG_AUTHORIZED_USER_ID = (
             self.constants.get_variable("TG_AUTHORIZED_USER_ID")
-            .split(",")
         )
         self.TG_PROGRESS_DOWNLOAD = (
             self.constants.get_variable("TG_PROGRESS_DOWNLOAD") == "True"
