@@ -339,6 +339,29 @@ class TelegramBot:
             logger.logger.info("USUARIO: %s NO AUTORIZADO", real_id)
             return False
 
+    def resolve_from_or_chat_id(self, event):
+        """
+        Devuelve:
+        - ID de origen si el mensaje es reenviado
+        - chat_id / user_id actual si NO es reenviado
+        """
+        try:
+            # 1️⃣ Mensaje reenviado
+            if event.fwd_from and event.fwd_from.from_id:
+                real_id = get_peer_id(event.fwd_from.from_id)
+                logger.logger.info(f"resolve_from_or_chat_id => fwd_from: {real_id}")
+                return real_id
+
+            # 2️⃣ Mensaje normal (grupo, canal o privado)
+            peer = event.peer_id
+            real_id = get_peer_id(peer)
+            logger.logger.info(f"resolve_from_or_chat_id => chat_id: {real_id}")
+            return real_id
+
+        except Exception as e:
+            logger.logger.error(f"resolve_from_or_chat_id Exception: {e}")
+            return None
+
     def resolve_id(self, fwd_from):
         try:
             real_id = get_peer_id(fwd_from.from_id)
@@ -575,7 +598,8 @@ class TelegramBot:
         logger.logger.info(f"download: {message.id}")
         file_name = ""
         try:
-            from_id = self.resolve_id(event.fwd_from)
+            #from_id = self.resolve_id(event.fwd_from)
+            from_id = self.resolve_from_or_chat_id(event)
 
             megabytes_total = total_size / 1024 / 1024
             download_start_time = time.time()
